@@ -66,7 +66,7 @@ h2,h5,div{
                     <div>
                         <svg style="width: 35px" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                         <h5>
-                            <a target="_blank" style='color:#fb8c00' href="https://github.com/pasjonatprogramowania/ChallengeHub">GitHub</a>
+                            <a target="_blank" style='color:#fb8c00' href="https://github.com/pasjonatprogramowania/ChallengeHub/tree/master">GitHub</a>
                         </h5>
                     </div>
                 </div>

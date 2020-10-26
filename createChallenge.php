@@ -16,25 +16,18 @@ if ($_SESSION['logged'] == true)
         $points      = intval($_POST['points']);
         $description = $_POST['description'];
 
-        header('Content-type: application/json');
-        echo json_encode($_POST['file']);
-
-        die();
-
         require_once("db.php");
 
-        
-
         $sth = $pdo->prepare('INSERT INTO `challenges` (`name`, `description`, `length`, `author_id`, `image_src`, `pkts`, `category_id`) VALUES (:name, :desc, :len, :author, :img, :pkts, :category)', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-        $sth->execute(array(':name' => $title, ':desc' => $description, ':len' => $time, ':author' => $_SESSION['user_id'], ':pkts' => $points, ':category' => 228, ':img' => 'images/no_image.jpg'));
+        $sth->execute(array(':name' => $title, ':desc' => $description, ':len' => $time, ':author' => $_SESSION['user_id'], ':pkts' => $points, ':category' => 1, ':img' => 'images/no_image.jpg'));
 
         $sth2 = $pdo->prepare('SELECT `id` FROM `challenges` WHERE `name` = :name AND `description` = :desc AND `length` = :len AND `author_id` = :author AND `image_src` = :img AND `pkts` = :pkts AND `category_id` = :category', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth2->bindValue(':name', $title);
         $sth2->bindValue(':desc', $description);
         $sth2->bindValue(':len', intval($time), PDO::PARAM_INT);
         $sth2->bindValue(':author', intval($_SESSION['user_id']), PDO::PARAM_INT);
-        $sth2->bindValue(':img', 'No image');
-        $sth2->bindValue(':category', 228, PDO::PARAM_INT);
+        $sth2->bindValue(':img', 'images/no_image.jpg');
+        $sth2->bindValue(':category', 1, PDO::PARAM_INT);
         $sth2->bindValue(':pkts', intval($points), PDO::PARAM_INT);
         $sth2->execute();
         $rows = $sth2->fetchAll(PDO::FETCH_NUM);
@@ -153,18 +146,17 @@ if ($_SESSION['logged'] == true)
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                            <a class='dropdown-trigger btn black text-darken-1 orange-text' href='#' style='display:flex; justify-content:flex-end' data-target='dropdown1'>Kategoria</a>
+                            <!-- <a class='dropdown-trigger btn black text-darken-1 orange-text' href='#' style='display:flex; justify-content:flex-end' data-target='dropdown1'>Kategoria</a>
                                 <ul id='dropdown1' id='' class='dropdown-content orange darken-1 '>
                                     <li><a class='black-text' name='0' onchange="console.log('a')" href="#!">Dieta</a></li>
                                     <li><a class='black-text' name='1' onchange="console.log('a')" href="#!">Ciało</a></li>
                                     <li><a class='black-text' name='2' onchange="console.log('a')" href="#!">Nałogi</a></li>
                                     <li><a class='black-text' name='3' onchange="console.log('a')" href="#!">Inne</a></li>
                                 </ul>
-                            
-   
-                                <!-- <label for="description"> Kategoria</label> -->
+                                
+                                
                             </div>
-                        </div>
+                        </div> -->
                         <div class="row">
                             <div class="input-field col s12">
                                 <input name="length" id="time" type="number" class="validate" onchange="countPointsForTime(event)" />
@@ -487,19 +479,6 @@ if ($_SESSION['logged'] == true)
                 console.log('points', pointsTotal);
             }
 
-            // window.addEventListener('load', function () {
-            //     document.querySelector('input[type="file"]').addEventListener('change', function () {
-            //     if (this.files && this.files[0]) {
-            //         var img = document.querySelector('img');
-            //         img.src = URL.createObjectURL(this.files[0]);
-            //         img.onload = imageIsLoaded;
-            //     }
-            //     });
-            // });
-
-            function imageIsLoaded() {
-                alert(this.src);
-            }
         </script>
         <script src='index.js'></script>
     </body>

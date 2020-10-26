@@ -18,7 +18,7 @@ if($_SESSION['logged'] == true)
         if($rows > 0)
         {
             $userId = $_SESSION['user_id'];
-            $challengeId = $rows[0][0];
+            //$challengeId = $rows[0][0];
 
             $alreadyStarted = $pdo->prepare('SELECT count(*) FROM `users_challenges` WHERE `user_id` = :user_id AND `challenge_id` = :id', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             $alreadyStarted->execute(array(':id' => $id, ':user_id' => $userId));
@@ -33,8 +33,8 @@ if($_SESSION['logged'] == true)
                 $sth3 = $pdo->prepare('INSERT INTO `users_challenges` (`user_id`, `challenge_id`, `start_time`) VALUES (:user_id, :id, :start_time)', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
                 $sth3->execute(array(':id' => $id, ':user_id' => $userId, ':start_time' => time()));
 
-                $sth4 = $pdo->prepare('SELECT count(*) FROM `users_challenges` WHERE `user_id` = :user_id AND `challenge_id` = :id AND `start_time` = :start_time', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-                $sth4->execute(array(':id' => $id, ':user_id' => $userId, ':start_time' => time()));
+                $sth4 = $pdo->prepare('SELECT count(*) FROM `users_challenges` WHERE `user_id` = :user_id AND `challenge_id` = :id', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+                $sth4->execute(array(':id' => $id, ':user_id' => $userId));
                 $rows4 = $sth4->fetchAll(PDO::FETCH_NUM);
 
                 if($rows4[0][0] != 0)
@@ -58,7 +58,7 @@ if($_SESSION['logged'] == true)
             else
             {
                 displayError("W tym wyzwaniu już bierzesz udział!");
-                header("Location: index.php");
+                header("Location: challenge.php?id=$id");
                 die();
             }
         }

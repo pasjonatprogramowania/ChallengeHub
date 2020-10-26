@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(0);
+
 session_start();
 
 if(isset($_GET['id']) && !empty($_GET['id']))
@@ -28,7 +30,49 @@ if(isset($_GET['id']) && !empty($_GET['id']))
         die();
     }
 
+    if(isset($_POST["submit"]))
+    {
+        $target_file = "images/" . basename($_FILES["image"]["name"]);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    
+        $target_file = "images/challenge_" . $id . "." . $imageFileType;
 
+        $check = getimagesize($_FILES["image"]["tmp_name"]);
+        if($check !== false)
+        {
+            if ($_FILES["image"]["size"] > 500000)
+            {
+                showError("Ten plik jest za duży.");
+            }
+            else
+            {
+                if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" )
+                {
+                    showError("Plik może być tylko o rozszerzeniach JPG, JPEG, PNG i GIF.");
+                }
+                else
+                {
+                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file))
+                    {
+                        $sth = $pdo->prepare('UPDATE `challenges` SET `image_src` = :src WHERE `id` = :id', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+                        $sth->execute(array(':id' => $id, ':src' => $target_file));
+
+                        header('Location: startChallenge.php?id=' . $id);
+                    }
+                    else
+                    {
+                        showError('Pod czas załadowania pliku wystąpił błąd.');
+                    }
+                }
+            }
+
+            
+        }
+        else
+        {
+            showError("Ten plik nie jest obrazem.");
+        }
+    }
 ?>
 <html lang="en">
     <head>
@@ -90,27 +134,39 @@ if(isset($_GET['id']) && !empty($_GET['id']))
         </div> -->
         <!-- Form -->
 
-    <div class="container mobile">
-        <div class="container">
-            <div class="row" style='margin-top:40px;'>
-                <form style='color:white'action="image.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data" id="myForm">
-                    Select image to upload:
-                    <input style='color:black' type="file" name="image" id="fileToUpload">
-                    <br /><img id="myImg" src="" alt="your image" /><br />
-                    <input style='color:black' type="submit" value="Upload Image" name="submit" onchange="checkPhoto(this,event)"/>
-                </form>
-            </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src='index.js'></script>
+    <script>
+        
+    window.addEventListener('load', function () {
+        document.querySelector('input[type="file"]').addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            var img = document.querySelector('img');
+            img.src = URL.createObjectURL(this.files[0]);
+        }
+        });
+    });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <div class="container">
+        <div class="row" style='margin-top:40px;'>
+            <h4>Wybierz obrazek do wyzwania</h4>
+            <form action="image.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data" id="myForm">
+                <input style='color:black' type="file" name="image" id="fileToUpload">
+                <br />
+                <br />
+                <br />
+                <br />
+                <img id="myImg" src="" alt="your image" />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <input style='color:black;width:100%' class='btn orange' type="submit" value="Wrzuć" name="submit" onchange="checkPhoto(this,event)"/>
+            </form>
         </div>
     </div>
-    <div class="row">
-        <a href="" style='color:white' class="btn orange darken-1 black-text toast-container col s12" onclick="postImg(event)">Zapisz wyzwanie</a>
-    </div>
-    <<script>
-        function postImg(e){
-            e.preventDefault();
-
-        }
-    </script>>
 </body>
 </html>
 <?php
@@ -119,6 +175,22 @@ if(isset($_GET['id']) && !empty($_GET['id']))
 else
 {
     header("Location: index.php");
+}
+
+function showError($text)
+{
+    echo("<script>
+    document.addEventListener('DOMContentLoaded', function(){
+
+        M.toast({
+            html: '$text',
+            classes: 'toast-container',
+            inDuration: 300,
+            outDuration: 300,
+            })
+        }
+        )  
+    </script>");
 }
 
 ?>
